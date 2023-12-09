@@ -21,15 +21,14 @@ func main() {
   fileScanner.Split(bufio.ScanLines)
 	line := 0
 
-	redMax := 12
-	greenMax:= 13
-	blueMax := 14
 	var possible []int
 	value := 0
 
 	for fileScanner.Scan() {
-		good := true
 		line = line + 1
+		redMax := 0
+		blueMax := 0
+		greenMax := 0
 		str := fileScanner.Text()
 		game := strings.Split(str, ":")
 		sets := strings.Split(game[1], ";")
@@ -42,20 +41,19 @@ func main() {
 			  color := answer[1]
 				fmt.Println(num, color, answer)
 				if(color == "blue" && num > blueMax) {
-					good = false
+					blueMax = num
 				}
 				if(color == "red" && num > redMax) {
-					good = false
+					redMax = num
 				}
 				if(color == "green" && num > greenMax) {
-					good = false
+					greenMax = num
 				}
 			}
 		}
-		if(good) {
-			possible = append(possible, line)
-			value = value + line
-		}
+		power := greenMax * blueMax * redMax
+		possible = append(possible, power)
+		value = value + power
 	}
 	fmt.Println(possible)
 	fmt.Println(value)
