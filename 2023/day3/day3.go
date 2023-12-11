@@ -9,21 +9,22 @@ import (
 )
 
 type code struct {
-    n int
-	  sx int
-	  ex int
-    y int
+	n int
+	sx int
+	ex int
+	y int
+	added bool
 }
 
 type sym struct {
-    s string
-	  x int
-    y int
+	s string
+	x int
+	y int
 }
 
 func main() {
-	readFile, err := os.Open("test.txt")
-	// readFile, err := os.Open("input.txt")
+	// readFile, err := os.Open("test.txt")
+	readFile, err := os.Open("input.txt")
 
 	if err != nil {
 		fmt.Println(err)
@@ -43,32 +44,69 @@ func main() {
 			if (item != ".") {
 				_, err := strconv.Atoi(item)
 				if (err != nil) {
-					check = append(check, sym{s: item, x: i , y: row})
+					check = append(check, sym{s: item, x: i, y: row})
+					if(num != "") {
+						n, _ := strconv.Atoi(num)
+						possible = append(possible, code{n: n, sx: i - len(num), ex: i - 1, y: row, added: false})	
+						num = ""
+					}
 				} else {
 					num =  num + item
 				}
 			} else {
 				if(num != "") {
 					n, _ := strconv.Atoi(num)
-					possible = append(possible, code{n: n, sx: i - len(num), ex: i, y: row})
+					possible = append(possible, code{n: n, sx: i - len(num), ex: i - 1, y: row, added: false})	
 					num = ""
 				}
 			}
 		}
+		i := len(line)
+		if(num != "") {
+			n, _ := strconv.Atoi(num)
+			possible = append(possible, code{n: n, sx: i - len(num), ex: i - 1, y: row, added: false})	
+			num = ""
+		}
 		row = row + 1
 	}
-	fmt.Println(check)
-	fmt.Println(possible)
 
 	value := 0
 
-	for _, poss := range possible {
+	for i, poss := range possible {
 		for _, s := range check {
-			if (((s.x - 1 >= poss.sx && s.x - 1 <= poss.ex) || (s.x + 1 >= poss.sx && s.x + 1 <= poss.ex)) &&
-				((s.y -1 <= poss.y && s.y - 1 >= poss.y) || (s.y + 1 <= poss.y && s.y + 1 >= poss.y))) {
-				fmt.Println("Add", poss.n, s)
-				value = value + poss.n
+			if(!poss.added) {
+				if(s.y == poss.y - 1) {
+					if(s.x >= poss.sx -1 && s.x <= poss.ex + 1) {
+						value += (poss.n)
+						poss.added = true
+						possible[i].added = true
+						fmt.Println("add", s, poss)
+					}
+				}
+				if(s.y == poss.y && !poss.added) {
+					if(s.x >= poss.sx -1 && s.x <= poss.ex + 1) {
+						value += (poss.n)
+						poss.added = true
+						possible[i].added = true
+						fmt.Println("add", s, poss)
+					}
+				}
+				if(s.y == poss.y + 1 && !poss.added) {
+					if(s.x >= poss.sx -1 && s.x <= poss.ex + 1) {
+						value += poss.n
+						poss.added = true
+						possible[i].added = true
+						fmt.Println("add", s, poss)
+					}
+				}
+			} else {
 			}
+		}
+	}
+
+	for _, poss := range possible {
+		if(!poss.added) {
+			fmt.Println("SKIP", poss)
 		}
 	}
 	fmt.Println(value)
