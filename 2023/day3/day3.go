@@ -20,6 +20,7 @@ type sym struct {
 	s string
 	x int
 	y int
+	gears []int
 }
 
 func main() {
@@ -71,32 +72,42 @@ func main() {
 	}
 
 	value := 0
+	gearValue := 0
 
 	for i, poss := range possible {
-		for _, s := range check {
+		for x, s := range check {
 			if(!poss.added) {
 				if(s.y == poss.y - 1) {
 					if(s.x >= poss.sx -1 && s.x <= poss.ex + 1) {
 						value += (poss.n)
 						poss.added = true
 						possible[i].added = true
-						fmt.Println("add", s, poss)
+						if (s.s == "*") {
+							fmt.Println("is gear", s, poss)
+							check[x].gears = append(s.gears, poss.n)
+						}
 					}
 				}
-				if(s.y == poss.y && !poss.added) {
+				if(s.y == poss.y) {
 					if(s.x >= poss.sx -1 && s.x <= poss.ex + 1) {
 						value += (poss.n)
 						poss.added = true
 						possible[i].added = true
-						fmt.Println("add", s, poss)
+						if (s.s == "*") {
+							fmt.Println("is gear", s, poss)
+							check[x].gears = append(s.gears, poss.n)
+						}
 					}
 				}
-				if(s.y == poss.y + 1 && !poss.added) {
+				if(s.y == poss.y + 1) {
 					if(s.x >= poss.sx -1 && s.x <= poss.ex + 1) {
 						value += poss.n
 						poss.added = true
 						possible[i].added = true
-						fmt.Println("add", s, poss)
+						if (s.s == "*") {
+							fmt.Println("is gear", s, poss)
+							check[x].gears = append(s.gears, poss.n)
+						}
 					}
 				}
 			} else {
@@ -104,10 +115,21 @@ func main() {
 		}
 	}
 
-	for _, poss := range possible {
-		if(!poss.added) {
-			fmt.Println("SKIP", poss)
+  sum := 0 
+	for _, poss := range check {
+		if(len(poss.gears) > 1) {
+			for _, v := range poss.gears {
+				if(sum > 0) {
+					sum = v * sum
+				} else {
+					sum = v
+				}
+			}
 		}
+		gearValue += sum
+		fmt.Println("value", sum, gearValue)
+		sum = 0
 	}
 	fmt.Println(value)
+	fmt.Println(gearValue)
 }
